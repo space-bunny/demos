@@ -3,7 +3,8 @@ package com.fancypixel.spacebunny.vdevicedemo;
 public class Constants {
     public static final String CODE_EXTRA_INTENT = "CODE_EXTRA_INTENT";
     public static final String DEVICE_KEY = "1290b485-6c23-47c2-bfe2-2e1b673a827b:DidtDFgEzyDmY3qxtgWPRQ";
-
+    public static final long TIME_TO_UPDATE = 50;
+    public static final long TIME_TO_SEND = 100;
 
     public static final String JSON_KEY_ID = "JSON_KEY_ID";
     public static final String JSON_KEY_TIME = "JSON_KEY_TIME";
