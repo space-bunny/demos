@@ -1,0 +1,115 @@
+body {
+  font-family: 'Roboto', sans-serif !important;
+  color: #FFFFFF !important;
+  background-color: #333;
+  background-image: url('images/map-image.png');
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Roboto', sans-serif !important;
+  color: #555 !important;
+}
+
+a {
+  color: #ef7b19 !important;
+}
+
+img.logo {
+  width: 400px;
+  position: center;
+}
+
+.center {
+  text-align: center;
+}
+
+.content {
+    margin-top: 2em;
+}
+
+.top-bar {
+  background-color: transparent;
+    text-align: right;
+    padding: 1em;
+}
+
+.top-bar .name {
+  margin: 1em !important;
+}
+
+.top-bar .name h1 {
+  color: white !important;
+}
+
+.top-bar li {
+    display: inline;
+    font-size: 12px !important;
+    font-family: 'Roboto Medium', sans-serif !important;
+}
+
+#messages {
+  overflow-y: auto;
+  height: 400px;
+}
+
+#send-button {
+  background: #5099DD;
+}
+
+.hidden-topic {
+  display: none;
+}
+
+button {
+  border-radius: 2px;
+  font-family: 'Roboto Medium', sans-serif !important;
+}
+
+input {
+  max-width: 300px;
+  margin: 1em auto !important;
+  border-radius: 3px;
+}
+
+.container {
+  padding: 1em;
+  background-color: #FFFFFF;
+  border-radius: 3px;
+  margin: 1em auto;
+  color: #666666
+}
+
+.container span {
+  text-align: left;
+  overflow: auto;
+}
+
+.generated-code h4 {
+  font-family: 'Roboto Medium', sans-serif !important;
+  color: #40ac57 !important;
+  text-align: center;
+  padding-top: 3em;
+}
+
+.alert-box {
+  margin-bottom: 0px !important;
+  padding: 0.475rem 1.5rem 0.475rem 0.675rem !important;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+#canvas-div {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  max-width: 600px;
+  padding: 0px !important;
+}
+
+button.secondary {
+  background-color: #ef7b19 !important;
+  opacity: 1 !important;
+  color: #FFFFFF !important;
+}

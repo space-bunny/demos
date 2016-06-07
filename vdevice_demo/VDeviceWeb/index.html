@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>SpaceBunny Virtual Device Demo</title>
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/css/normalize.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/css/foundation.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="font-awesome-4.6.3/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+  </head>
+
+  <body>
+
+    <nav class="top-bar" data-topbar role="navigation">
+      <ul>
+        <a href=""><li class="name">DOWNLOAD APP</li></a>
+        <a href="#"><li class="name" id="action-regenerate-code">REGENERATE CODE</li></a>
+      </ul>
+    </nav>
+
+    <div class="small-12 columns">
+      <div class="small-12 columns center">
+      <img src="images/logodemo.png" class="logo">
+      </div>
+      <div class="small-12 columns center" id="how-to">
+        <div class="small-5 container">
+          <span class="columns"> 
+            <h4>Virtual Device Demo:</h4> 
+            Per provare a fare qualcosa scarica l'app e fa quel copiando e incollando il codice che trovi qui sotto
+          </span>
+          <span class="generated-code">
+            <h4 class="content" id="generated-code"></h4>
+          </span>
+          <span id="flash-messages"></span>
+          <span id="messages"></span>
+        </div>
+      </div>
+
+      <div class="small-12 columns center" id="canvas-container">
+      <div class="small-5 container" id="canvas-div">
+        <canvas id="canvas" />
+      </div>
+      </div>
+      <div class="small-12 columns center">
+        <button type="button" disabled="disabled" id="info-button" class="small secondary">DEVICE DISCONNECTED</button>
+        <button type="button" name="start-casting-button" id="start-casting-button" class="small success">START CASTING</button>
+        <button type="button" name="stop-casting-button" id="stop-casting-button" class="small success">STOP CASTING</button>
+      </div>
+    </div>
+
+
+
+    <!-- Scripts placed at the end of the document so the pages load faster -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/js/foundation.min.js"></script>
+
+    <script src="js/three.min.js"></script>
+    <script src="js/renderers/Projector.js"></script>
+    <script src="js/renderers/CanvasRenderer.js"></script>
+
+    <!-- The SpaceBunny library and Canvas manager -->
+    
+    <script src="spacebunny.js"></script>
+
+    <script>
+      var camera, scene, renderer;
+      var cube;
+      var targetRotation = 0;
+      var code;
+
+
+      $(document).ready(function() {
+        var webStompClient = undefined;
+
+        function updateUI(action) {
+          if(action == 'connect') {
+            $('#start-casting-button').hide();
+            $('#stop-casting-button').show();
+            $('#info-button').show();
+            $('#canvas-container').show();
+            $('#how-to').hide();
+            $('#action-regenerate-code').hide();
+          } else {
+            $('#start-casting-button').show();
+            $('#stop-casting-button').hide();
+            $('#info-button').hide();
+            $('#canvas-container').hide();
+            $('#how-to').show();
+            $('#action-regenerate-code').show();
+
+            $("#info-button").html('device disconnected'.toUpperCase() + ', CODE: ' + code);
+          }
+        }
+
+        var flashMessage = function(message, type) {
+          var content = "<div data-alert class='alert-box " + type + "'>" +
+            "<div>" + message + "</div>" +
+          "</div>";
+          $('#flash-messages').append(content);
+          $('.alert-box').fadeOut(3000);
+        };
+
+        var htmlEntities = function(str) {
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        var messageCallback = function(content, headers) {
+          //var msg = htmlEntities(content);
+          var data = JSON.parse(content);
+          var msg = {
+            code : data["JSON_KEY_ID"],
+            time : data["JSON_KEY_TIME"],
+            device_name : data["JSON_KEY_DEVICE_NAME"],
+            device_type : data["JSON_KEY_DEVICE_TYPE"],
+            sensors : []
+          }
+
+          for (var i = 0; i < data["JSON_KEY_SENSOR"].length; i++) {
+            var sensor = {
+             name : data["JSON_KEY_SENSOR"][i]["JSON_KEY_SENSOR_NAME"],
+             x : data["JSON_KEY_SENSOR"][i]["JSON_KEY_SENSOR_VALUE_X"],
+             y : data["JSON_KEY_SENSOR"][i]["JSON_KEY_SENSOR_VALUE_Y"],
+             z : data["JSON_KEY_SENSOR"][i]["JSON_KEY_SENSOR_VALUE_Z"]
+            }
+            msg.sensors.push(sensor);
+          }
+
+          if (msg.code == code) {
+            $("#info-button").html('STREAMING FROM ' + msg.device_name.toUpperCase() + ' [' + msg.device_type.toUpperCase() + ']');
+            if (msg.sensors.length > 0) {
+              for (var i = 0; i < msg.sensors.length; i++) {
+                if (msg.sensors[i].name.indexOf("Accelerometer") > -1) {
+                  updateDevicePos(msg.sensors[i]);
+                  break;
+                }
+              }
+            }
+          }
+        };
+
+        function makeid() {
+            var text = "";
+            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+            for( var i=0; i < 5; i++ )
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+            return text;
+        }
+
+        function generated_code() {
+          code = makeid();
+          $('#generated-code').html(code);
+        }
+
+        function connect() {
+          var connectionParams = {};
+
+          connectionParams['client'] = 'ynPDRX2szb1Sj3sNvk23VnCmdRCKZyZmPJBmceaqzb4';
+          connectionParams['secret'] = 'hLE2z3WgRmkzsA3SKSm5tZED6usbWiTmiwH7xugZA7E';
+          connectionParams['endpointUrl'] = 'https://api.spacebunny.io';
+          connectionParams['tls'] = true;
+
+          var streamHooks = [];
+          var stream = 'VDeviceDemoStream';
+          var cache = false;
+          if(stream) {
+            streamHooks.push({
+              stream: stream,
+              cache: cache,
+              callback: messageCallback
+            });
+          }
+
+          webStompClient = new StompStreamClient(connectionParams);
+          webStompClient.streamFrom(streamHooks).then(function(res) {
+            updateUI('connect');
+          }).catch(function(reason) {
+            flashMessage('Error during connections: ' + reason, 'alert');
+            console.error(reason);
+          });
+        }
+
+        function disconnect() {
+          webStompClient.disconnect().then(function(res) {
+            updateUI('disconnect')
+            }).catch(function(reason) {
+              console.error(reason);
+            });
+        }
+
+        if(window.WebSocket) {
+
+          generated_code();
+          updateUI('disconnect')
+
+
+          $('#action-regenerate-code').click(function(e) {
+            e.preventDefault();
+            generated_code();
+          });
+
+          $('#start-casting-button').click(function(e) {
+            e.preventDefault();
+            connect();
+          });
+
+          $('#stop-casting-button').click(function(e) {
+            e.preventDefault();
+            disconnect();
+          });
+
+        } else {
+          $(body).html("\
+              <h1>Get a new Web Browser!</h1>\
+              <p>\
+              Your browser does not support WebSockets. This example will not work properly.<br>\
+              Please use a Web Browser with WebSockets support (WebKit or Google Chrome).\
+              </p>\
+          ");
+        }
+      });
+
+
+
+      init();
+      animate();
+      
+      function init() {
+        camera = new THREE.PerspectiveCamera( 60, $('#canvas-div').width() / $('#canvas-div').height(), 1, 20000 );
+        camera.position.y = 300;
+        camera.position.z = 1000;
+
+        scene = new THREE.Scene();
+
+        // Cube
+        var geometry = new THREE.BoxGeometry( 400, 600, 100 );
+        for ( var i = 0; i < geometry.faces.length; i += 2 ) {
+          var hex = Math.random() * 0xffffff;
+          geometry.faces[ i ].color.setHex( hex );
+          geometry.faces[ i + 1 ].color.setHex( hex );
+        }
+        var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors, overdraw: 0.5 } );
+        cube = new THREE.Mesh( geometry, material );
+        cube.position.y = 300;
+        scene.add( cube );
+
+        //camera.lookAt(cube);
+
+        renderer = new THREE.CanvasRenderer( {canvas: document.getElementById('canvas') } );
+        renderer.setClearColor( 0xffffff );
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( $('#canvas-div').width(), $('#canvas-div').height() );
+
+        //
+        window.addEventListener( 'resize', onWindowResize, false );
+
+      }
+
+      function updateDevicePos(rotation) {
+        //cube.rotation.x = Math.atan2(rotation.y, rotation.z) - Math.PI / 2;
+        //cube.rotation.y = Math.atan2(rotation.z, rotation.x) - Math.PI / 2;
+        cube.rotation.z = Math.atan2(rotation.x, rotation.y);
+        render();
+      }
+
+      function onWindowResize() {
+        camera.aspect = $('#canvas-div').width() / $('#canvas-div').height();
+        camera.updateProjectionMatrix();
+        renderer.setSize( $('#canvas-div').width(), $('#canvas-div').height());
+      }
+      function animate() {
+        requestAnimationFrame( animate );
+        render();
+      }
+      function render() {
+        renderer.render( scene, camera );
+      }
+    </script>
+
+
+  </body>
+</html>
