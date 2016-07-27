@@ -39,6 +39,19 @@ public class Main extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.action_more_sb).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                CustomTabsIntent customTabsIntent = builder.build();
+                builder.setToolbarColor(ContextCompat.getColor(Main.this, R.color.colorAccent));
+                builder.setStartAnimations(Main.this, android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+                builder.setExitAnimations(Main.this, android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+                builder.setShowTitle(true);
+                customTabsIntent.launchUrl(Main.this, Uri.parse("http://www.spacebunny.io/"));
+            }
+        });
+
         findViewById(R.id.action_menu).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -47,11 +60,11 @@ public class Main extends AppCompatActivity {
                 dialogView.findViewById(R.id.action_copy_web).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                        android.content.ClipData clip = android.content.ClipData.newPlainText("text label","http://www.spacebunny.io/demo/vdevicedemo/");
-                        clipboard.setPrimaryClip(clip);
                         dialog.dismiss();
-                        Toast.makeText(Main.this, getString(R.string.text_copied), Toast.LENGTH_SHORT).show();
+                        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                        sharingIntent.setType("text/plain");
+                        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "http://www.demoapps.spacebunny.io/virtual_device/index.html");
+                        startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.action_copy)));
                     }
                 });
                 dialogView.findViewById(R.id.action_try).setOnClickListener(new View.OnClickListener() {
@@ -59,18 +72,6 @@ public class Main extends AppCompatActivity {
                     public void onClick(View v) {
                         dialog.dismiss();
                         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/dev?id=7872946254476055994")));
-                    }
-                });
-                dialogView.findViewById(R.id.action_more_sb).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-                        CustomTabsIntent customTabsIntent = builder.build();
-                        builder.setToolbarColor(ContextCompat.getColor(Main.this, R.color.colorAccent));
-                        builder.setStartAnimations(Main.this, android.R.anim.slide_in_left, android.R.anim.slide_out_right);
-                        builder.setExitAnimations(Main.this, android.R.anim.slide_in_left, android.R.anim.slide_out_right);
-                        builder.setShowTitle(true);
-                        customTabsIntent.launchUrl(Main.this, Uri.parse("http://www.spacebunny.io/"));
                     }
                 });
                 dialog.setContentView(dialogView);

@@ -11,6 +11,6 @@
     <string name="code_error">Error, code is not correct!</string>
     <string name="action_more">Find out more about Space Bunny</string>
     <string name="text_copied">Web App URL copied!</string>
-    <string name="action_copy">Copy Web App Link</string>
+    <string name="action_copy">Share Web App Link</string>
     <string name="action_try">Try other Demos</string>
 </resources>
