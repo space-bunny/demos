@@ -4,9 +4,13 @@
     <string name="action_generate">Generate Code</string>
     <string name="action_insert">Insert Code</string>
     <string name="action_start">Start Casting</string>
-    <string name="text_demo_desc">Description</string>
+    <string name="text_demo_desc">Thanks to download this demo, now open the web interface.\nEnter below the code that you find and start casting your device orientation\n\nYeah, it\'s not that great thing but, underneath, it does a lot of work!</string>
     <string name="action_insert_code_capslock">INSERT CODE</string>
     <string name="activity_send_data">Send Data</string>
-    <string name="action_sending_data">Sending Data...</string>
+    <string name="action_sending_data">Sending Data…</string>
     <string name="code_error">Error, code is not correct!</string>
+    <string name="action_more">Find out more about Space Bunny</string>
+    <string name="text_copied">Web App URL copied!</string>
+    <string name="action_copy">Copy Web App Link</string>
+    <string name="action_try">Try other Demos</string>
 </resources>
