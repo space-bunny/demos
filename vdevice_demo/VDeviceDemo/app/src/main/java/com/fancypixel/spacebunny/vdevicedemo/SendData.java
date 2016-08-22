@@ -169,7 +169,7 @@ public class SendData extends AppCompatActivity implements SensorEventListener {
 
             for (SensorEvent event : sensor_data_list) {
                 JSONObject sensor = new JSONObject();
-                sensor.put(Constants.JSON_KEY_SENSOR_NAME, event.sensor.getName());
+                sensor.put(Constants.JSON_KEY_SENSOR_NAME, "" + event.sensor.getType());
                 sensor.put(Constants.JSON_KEY_SENSOR_VALUE_X, event.values[0]);
                 sensor.put(Constants.JSON_KEY_SENSOR_VALUE_Y, event.values[1]);
                 sensor.put(Constants.JSON_KEY_SENSOR_VALUE_Z, event.values[2]);
