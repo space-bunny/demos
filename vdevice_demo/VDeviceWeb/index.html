@@ -137,7 +137,7 @@
             $("#info-button").html('STREAMING FROM ' + msg.device_name.toUpperCase() + ' [' + msg.device_type.toUpperCase() + ']');
             if (msg.sensors.length > 0) {
               for (var i = 0; i < msg.sensors.length; i++) {
-                if (msg.sensors[i].name.indexOf("Accelerometer") > -1) {
+                if (msg.sensors[i].name == "1") {
                   updateDevicePos(msg.sensors[i]);
                   break;
                 }
